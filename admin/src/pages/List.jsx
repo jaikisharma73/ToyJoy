@@ -1,11 +1,13 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { backendUrl, currency } from '../App'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 const List = ({ token }) => {
 
   const [list, setList] = useState([])
+  const navigate = useNavigate();
 
   const fetchList = async () => {
     try {
@@ -70,7 +72,20 @@ const List = ({ token }) => {
               <p>{item.name}</p>
               <p>{item.category}</p>
               <p>{currency}{item.price}</p>
-              <p onClick={()=>removeProduct(item._id)} className='text-right md:text-center cursor-pointer text-lg'>X</p>
+              <div className='flex gap-3 justify-end md:justify-center'>
+  <button
+    onClick={() => navigate(`/edit-product/${item._id}`)}
+    className='text-blue-600 font-medium'
+  >
+    Edit
+  </button>
+  <p
+    onClick={()=>removeProduct(item._id)}
+    className='cursor-pointer text-lg text-red-600'
+  >
+    X
+  </p>
+</div>
             </div>
           ))
         }
