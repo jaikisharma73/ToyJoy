@@ -17,7 +17,13 @@ const Add = ({token}) => {
    const [category, setCategory] = useState("Boys");
    const [subCategory, setSubCategory] = useState("Educational Toys");
    const [bestseller, setBestseller] = useState(false);
-      const [sizes, setSizes] = useState([]);
+    const [sizes, setSizes] = useState([
+  { size: "S", price: "" },
+  { size: "M", price: "" },
+  { size: "L", price: "" },
+  { size: "XL", price: "" },
+  { size: "XXL", price: "" }
+]);
 
    const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -123,29 +129,32 @@ const Add = ({token}) => {
         </div>
 
         <div>
-          <p className='mb-2'>Product Sizes</p>
-          <div className='flex gap-3'>
-            <div onClick={()=>setSizes(prev => prev.includes("S") ? prev.filter( item => item !== "S") : [...prev,"S"])}>
-              <p className={`${sizes.includes("S") ? "bg-pink-100" : "bg-slate-200" } px-3 py-1 cursor-pointer`}>S</p>
-            </div>
-            
-            <div onClick={()=>setSizes(prev => prev.includes("M") ? prev.filter( item => item !== "M") : [...prev,"M"])}>
-              <p className={`${sizes.includes("M") ? "bg-pink-100" : "bg-slate-200" } px-3 py-1 cursor-pointer`}>M</p>
-            </div>
+  <p className='mb-2'>Product Sizes & Prices</p>
 
-            <div onClick={()=>setSizes(prev => prev.includes("L") ? prev.filter( item => item !== "L") : [...prev,"L"])}>
-              <p className={`${sizes.includes("L") ? "bg-pink-100" : "bg-slate-200" } px-3 py-1 cursor-pointer`}>L</p>
-            </div>
+  <div className='flex flex-col gap-3'>
 
-            <div onClick={()=>setSizes(prev => prev.includes("XL") ? prev.filter( item => item !== "XL") : [...prev,"XL"])}>
-              <p className={`${sizes.includes("XL") ? "bg-pink-100" : "bg-slate-200" } px-3 py-1 cursor-pointer`}>XL</p>
-            </div>
+    {sizes.map((item, index) => (
+      <div key={index} className='flex items-center gap-4'>
 
-            <div onClick={()=>setSizes(prev => prev.includes("XXL") ? prev.filter( item => item !== "XXL") : [...prev,"XXL"])}>
-              <p className={`${sizes.includes("XXL") ? "bg-pink-100" : "bg-slate-200" } px-3 py-1 cursor-pointer`}>XXL</p>
-            </div>
-          </div>
-        </div>
+        <span className='w-12 font-medium'>{item.size}</span>
+
+        <input
+          type="number"
+          placeholder='Enter price'
+          value={item.price}
+          onChange={(e)=>{
+            const updatedSizes = [...sizes];
+            updatedSizes[index].price = e.target.value;
+            setSizes(updatedSizes);
+          }}
+          className='border px-3 py-1 w-32'
+        />
+
+      </div>
+    ))}
+
+  </div>
+</div>
 
         <div className='flex gap-2 mt-2'>
           <input onChange={() => setBestseller(prev => !prev)} checked={bestseller} type="checkbox" id='bestseller' />
