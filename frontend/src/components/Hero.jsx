@@ -1,7 +1,22 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { assets } from '../assets/assets'
 
 const Hero = () => {
+  const images = [
+  assets.hero_img,
+  assets.hero_img2,
+  assets.hero_img3
+]
+
+const [currentIndex, setCurrentIndex] = useState(0)
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentIndex(prev => (prev + 1) % images.length)
+  }, 3000)
+
+  return () => clearInterval(interval)
+}, [])
   return (
     <div className='flex flex-col sm:flex-row border border-gray-400'>
       {/* Hero Left Side */}
@@ -19,7 +34,17 @@ const Hero = () => {
             </div>
       </div>
       {/* Hero Right Side */}
-      <img className='w-full sm:w-1/2' src={assets.hero_img} alt="" />
+      <div className='w-full sm:w-1/2 relative h-[260px] sm:h-[400px] md:h-[500px] overflow-hidden'>
+  {images.map((img, index) => (
+    <img
+      key={index}
+      src={img}
+      alt="hero"
+      className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-1000
+      ${index === currentIndex ? 'opacity-100' : 'opacity-0'}`}
+    />
+  ))}
+</div>
     </div>
   )
 }
