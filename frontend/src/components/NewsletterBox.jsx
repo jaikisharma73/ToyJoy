@@ -34,7 +34,7 @@ const ContactUs = () => {
       </p>
       <form 
   onSubmit={onSubmit} 
-  className="w-full sm:w-1/2 flex flex-col sm:flex-row items-stretch gap-3 mx-auto my-6 p-4  border-gray-300 rounded-lg"
+  className="w-full sm:w-1/2 flex flex-col gap-3 mx-auto my-6 p-4 border-gray-300 rounded-lg"
 >
   <textarea
     rows={6}
@@ -43,9 +43,17 @@ const ContactUs = () => {
     className="w-full p-3 text-sm outline-none border border-gray-400 rounded-md resize-none"
   />
 
+  <input
+    type="tel"
+    name="number"
+    placeholder="Enter Your Contact Number"
+    className="w-full border border-gray-400 p-3 text-sm outline-none rounded-md"
+    required
+  />
+
   <button
     type="submit"
-    className="bg-black text-white text-sm px-6 py-3 rounded-md sm:self-center"
+    className="bg-black text-white text-sm px-6 py-3 rounded-md"
   >
     Submit
   </button>
