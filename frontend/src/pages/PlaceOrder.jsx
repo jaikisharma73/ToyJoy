@@ -76,6 +76,7 @@ const PlaceOrder = () => {
             }
 
             let orderData = {
+                 userId: localStorage.getItem("userId"),
                 address: formData,
                 items: orderItems,
                 amount: getCartAmount() + delivery_fee

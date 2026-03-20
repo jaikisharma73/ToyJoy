@@ -51,6 +51,12 @@ const Orders = ({ token }) => {
   return (
     <div>
       <h3>Order Page</h3>
+      {/* 🚨 Fraud Alert */}
+{orders.some(o => o.isFraud) && (
+  <div className="bg-red-600 text-white p-3 my-3 font-semibold rounded">
+    ⚠️ High Risk Fraud Orders Detected!
+  </div>
+)}
       <div>
         {
           orders.map((order, index) => (
@@ -74,12 +80,26 @@ const Orders = ({ token }) => {
                 </div>
                 <p>{order.address.phone}</p>
               </div>
-              <div>
-                <p className='text-sm sm:text-[15px]'>Items : {order.items.length}</p>
-                <p className='mt-3'>Method : {order.paymentMethod}</p>
-                <p>Payment : { order.payment ? 'Done' : 'Pending' }</p>
-                <p>Date : {new Date(order.date).toLocaleDateString()}</p>
-              </div>
+             <div>
+  <p className='text-sm sm:text-[15px]'>Items : {order.items.length}</p>
+  <p className='mt-3'>Method : {order.paymentMethod}</p>
+  <p>Payment : { order.payment ? 'Done' : 'Pending' }</p>
+  <p>Date : {new Date(order.date).toLocaleDateString()}</p>
+
+  {/* 🎯 Risk Level */}
+  <p className={`mt-2 font-bold ${
+    order.riskLevel === "High" ? "text-red-600" :
+    order.riskLevel === "Medium" ? "text-orange-500" :
+    "text-green-600"
+  }`}>
+    Risk : {order.riskLevel || "Low"}
+  </p>
+
+  {/* 🚨 Fraud Status */}
+  <p className='font-bold'>
+    Fraud : {order.isFraud ? "🚨 Yes" : "✅ No"}
+  </p>
+</div>
               <p className='text-sm sm:text-[15px]'>{currency}{order.amount}</p>
               <select onChange={(event)=>statusHandler(event,order._id)} value={order.status} className='p-2 font-semibold'>
                 <option value="Order Placed">Order Placed</option>

@@ -2,6 +2,7 @@ import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import Stripe from 'stripe'
 import razorpay from 'razorpay'
+import fraudCheck from "../utils/fraudCheck.js";
 
 // global variables
 const currency = 'inr'
@@ -20,17 +21,19 @@ const placeOrder = async (req,res) => {
     
     try {
         
-        const { userId, items, amount, address} = req.body;
-
+        const { userId , items, amount, address} = req.body;
+        const riskLevel = fraudCheck({ amount, items, paymentMethod: "COD" });
         const orderData = {
-            userId,
-            items,
-            address,
-            amount,
-            paymentMethod:"COD",
-            payment:false,
-            date: Date.now()
-        }
+        userId,
+        items,
+        address,
+        amount,
+        paymentMethod:"COD",
+        payment:false,
+        date: Date.now(),
+        riskLevel,
+        isFraud: riskLevel === "High"
+}
 
         const newOrder = new orderModel(orderData)
         await newOrder.save()
@@ -53,7 +56,7 @@ const placeOrderStripe = async (req,res) => {
         
         const { userId, items, amount, address} = req.body
         const { origin } = req.headers;
-
+        const riskLevel = fraudCheck({ amount, items, paymentMethod: "Stripe" });
         const orderData = {
             userId,
             items,
@@ -61,7 +64,9 @@ const placeOrderStripe = async (req,res) => {
             amount,
             paymentMethod:"Stripe",
             payment:false,
-            date: Date.now()
+            date: Date.now(),
+            riskLevel,
+             isFraud: riskLevel === "High"
         }
 
         const newOrder = new orderModel(orderData)
@@ -131,7 +136,7 @@ const placeOrderRazorpay = async (req,res) => {
     try {
         
         const { userId, items, amount, address} = req.body
-
+        const riskLevel = fraudCheck({ amount, items, paymentMethod: "Razorpay" });
         const orderData = {
             userId,
             items,
@@ -139,7 +144,9 @@ const placeOrderRazorpay = async (req,res) => {
             amount,
             paymentMethod:"Razorpay",
             payment:false,
-            date: Date.now()
+            date: Date.now(),
+             riskLevel,
+             isFraud: riskLevel === "High"
         }
 
         const newOrder = new orderModel(orderData)

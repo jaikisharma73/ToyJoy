@@ -11,9 +11,7 @@ const createToken = (id) => {
 // Route for user login
 const loginUser = async (req, res) => {
     try {
-
         const { email, password } = req.body;
-
         const user = await userModel.findOne({ email });
 
         if (!user) {
@@ -23,10 +21,16 @@ const loginUser = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (isMatch) {
-
             const token = createToken(user._id)
-            res.json({ success: true, token })
-
+            res.json({
+                success: true,
+                token,
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email
+                }
+            })
         }
         else {
             res.json({ success: false, message: 'Invalid credentials' })
@@ -41,16 +45,13 @@ const loginUser = async (req, res) => {
 // Route for user register
 const registerUser = async (req, res) => {
     try {
-
         const { name, email, password } = req.body;
 
-        // checking user already exists or not
         const exists = await userModel.findOne({ email });
         if (exists) {
             return res.json({ success: false, message: "User already exists" })
         }
 
-        // validating email format & strong password
         if (!validator.isEmail(email)) {
             return res.json({ success: false, message: "Please enter a valid email" })
         }
@@ -58,7 +59,6 @@ const registerUser = async (req, res) => {
             return res.json({ success: false, message: "Please enter a strong password" })
         }
 
-        // hashing user password
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
 
@@ -69,10 +69,17 @@ const registerUser = async (req, res) => {
         })
 
         const user = await newUser.save()
-
         const token = createToken(user._id)
 
-        res.json({ success: true, token })
+        res.json({
+            success: true,
+            token,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        })
 
     } catch (error) {
         console.log(error);
