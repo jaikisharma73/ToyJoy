@@ -140,21 +140,30 @@ const ShopContextProvider = (props) => {
     }
 
 
-    const getUserCart = async ( token ) => {
-        try {
-            const response = await axios.post(
-                backendUrl + '/api/cart/get',
-                {},
-                { headers:{token} }
-            )
-            if (response.data.success) {
-                setCartItems(response.data.cartData)
-            }
-        } catch (error) {
-            console.log(error)
-            toast.error(error.message)
+    // ✅ Updated getUserCart
+const getUserCart = async (token) => {
+    if (!token) return;
+
+    try {
+        // Decode token to get userId or pass it explicitly
+        // Example: backend expects GET /api/cart/:userId
+        const userId = localStorage.getItem("userId"); // store userId after login
+
+        if (!userId) return;
+
+        const response = await axios.get(
+            `${backendUrl}/api/cart/${userId}`, 
+            { headers: { token } }              
+        );
+
+        if (response.data.cartData) {
+            setCartItems(response.data.cartData);
         }
+    } catch (error) {
+        console.log("getUserCart error:", error);
+        toast.error(error.response?.data?.message || error.message);
     }
+};
 
 
     useEffect(() => {
