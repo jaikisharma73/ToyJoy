@@ -3,10 +3,11 @@ import { ShopContext } from '../context/ShopContext'
 import { assets } from '../assets/assets';
 import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
+import HeroChatbot from '../components/HeroChatBot';
 
 const Collection = () => {
 
-  const { products , search , showSearch } = useContext(ShopContext);
+  const { products , search , showSearch , aiFilter } = useContext(ShopContext);
   const [showFilter,setShowFilter] = useState(false);
   const [filterProducts,setFilterProducts] = useState([]);
   const [category,setCategory] = useState([]);
@@ -73,6 +74,40 @@ const Collection = () => {
     }
 
   }
+  useEffect(()=>{
+    sortProduct();
+},[sortType])
+
+
+useEffect(() => {
+  if (!aiFilter) return;
+
+  if (aiFilter === "educational") {
+    setSubCategory(["Educational Toys"]);
+  } 
+  else if (aiFilter === "building") {
+    setSubCategory(["Building & Construction Toys"]);
+  }
+  else if (aiFilter === "indoor") {
+    setSubCategory(["Indoor & Outdoor Play Toys"]);
+  }
+
+}, [aiFilter]);
+
+  useEffect(() => {
+  if (!aiFilter) return;
+
+  if (aiFilter === "outdoor") {
+    setSubCategory(["Indoor & Outdoor Play Toys"]);
+  }
+  else if (aiFilter === "education") {
+    setSubCategory(["Educational Toys"]);
+  } 
+  else if (aiFilter === "building") {
+    setSubCategory(["Building & Construction Toys"]);
+  }
+
+}, [aiFilter]);
 
   useEffect(()=>{
       applyFilter();
@@ -82,7 +117,10 @@ const Collection = () => {
     sortProduct();
   },[sortType])
 
-  return (
+  
+
+  return (<div>
+    <HeroChatbot/>
     <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t'>
       
       {/* Filter Options */}
@@ -95,13 +133,31 @@ const Collection = () => {
           <p className='mb-3 text-sm font-medium'>CATEGORIES</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Boys'} onChange={toggleCategory}/> Boys
+              <input
+  className='w-3'
+  type="checkbox"
+  value={'Boys'}
+  checked={category.includes("Boys")}
+  onChange={toggleCategory}
+/> Boys
+            </p>
+            <p className='flkx gap-2'>
+              <input
+  className='w-3'
+  type="checkbox"
+  value={'Girls'}
+  checked={category.includes("Girls")}
+  onChange={toggleCategory}
+/> Girls
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Girls'} onChange={toggleCategory}/> Girls
-            </p>
-            <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Kids'} onChange={toggleCategory}/> kids
+              <input
+  className='w-3'
+  type="checkbox"
+  value={'Kids'}
+  checked={category.includes("Kids")}
+  onChange={toggleCategory}
+/> kids
             </p>
           </div>
         </div>
@@ -110,13 +166,31 @@ const Collection = () => {
           <p className='mb-3 text-sm font-medium'>TYPE</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Educational Toys'} onChange={toggleSubCategory}/> Educational Toys
+             <input
+  className='w-3'
+  type="checkbox"
+  value={'Educational Toys'}
+  checked={subCategory.includes("Educational Toys")}
+  onChange={toggleSubCategory}
+/> Educational Toys
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Building & Construction Toys'} onChange={toggleSubCategory}/> Building & Construction Toys
+             <input
+  className='w-3'
+  type="checkbox"
+  value={'Building & Construction Toys'}
+  checked={subCategory.includes("Building & Construction Toys")}
+  onChange={toggleSubCategory}
+/> Building & Construction Toys
             </p>
             <p className='flex gap-2'>
-              <input className='w-3' type="checkbox" value={'Indoor & Outdoor Play Toys'} onChange={toggleSubCategory}/> Indoor & Outdoor Play Toys
+             <input
+  className='w-3'
+  type="checkbox"
+  value={'Indoor & Outdoor Play Toys'}
+  checked={subCategory.includes("Indoor & Outdoor Play Toys")}
+  onChange={toggleSubCategory}
+/> Indoor & Outdoor Play Toys
             </p>
           </div>
         </div>
@@ -145,6 +219,7 @@ const Collection = () => {
         </div>
       </div>
 
+    </div>
     </div>
   )
 }

@@ -7,6 +7,8 @@ import userRouter from './routes/userRoute.js'
 import productRouter from './routes/productRoute.js'
 import cartRouter from './routes/cartRoute.js'
 import orderRouter from './routes/orderRoute.js'
+import chatRoute from "./routes/chat.js";
+
 
 // App Config
 const app = express()
@@ -19,6 +21,8 @@ app.use(express.json())
 app.use(cors())
 
 // api endpoints
+
+app.use("/api/chat", chatRoute);
 app.use('/api/user',userRouter)
 app.use('/api/product',productRouter)
 app.use('/api/cart',cartRouter)
