@@ -17,38 +17,42 @@ const razorpayInstance = new razorpay({
 })
 
 // Placing orders using COD Method
-const placeOrder = async (req,res) => {
-    
-    try {
-        
-        const { userId , items, amount, address} = req.body;
-        const riskLevel = fraudCheck({ amount, items, paymentMethod: "COD" });
-        const orderData = {
-        userId,
-        items,
-        address,
-        amount,
-        paymentMethod:"COD",
-        payment:false,
-        date: Date.now(),
-        riskLevel,
-        isFraud: riskLevel === "High"
-}
+const placeOrder = async (req, res) => {
+  try {
+    const { userId, items, amount, address } = req.body;
 
-        const newOrder = new orderModel(orderData)
-        await newOrder.save()
-
-        await userModel.findByIdAndUpdate(userId,{cartData:{}})
-
-        res.json({success:true,message:"Order Placed"})
-
-
-    } catch (error) {
-        console.log(error)
-        res.json({success:false,message:error.message})
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "UserId is required" });
     }
 
-}
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const riskLevel = fraudCheck({ amount, items, paymentMethod: "COD" });
+
+    const newOrder = new orderModel({
+      userId,
+      items,
+      address,
+      amount,
+      paymentMethod: "COD",
+      payment: false,
+      date: Date.now(),
+      riskLevel,
+      isFraud: riskLevel === "High"
+    });
+
+    await newOrder.save();
+    await userModel.findByIdAndUpdate(userId, { cartData: {} });
+
+    res.json({ success: true, message: "Order placed successfully!", orderId: newOrder._id });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 // Placing orders using Stripe Method
 const placeOrderStripe = async (req,res) => {

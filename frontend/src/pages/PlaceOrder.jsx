@@ -56,75 +56,73 @@ const PlaceOrder = () => {
         rzp.open()
     }
 
-    const onSubmitHandler = async (event) => {
-        event.preventDefault()
-        try {
+    // PlaceOrder.jsx
+const onSubmitHandler = async (e) => {
+    e.preventDefault();
 
-            let orderItems = []
-
-            for (const items in cartItems) {
-                for (const item in cartItems[items]) {
-                    if (cartItems[items][item] > 0) {
-                        const itemInfo = structuredClone(products.find(product => product._id === items))
-                        if (itemInfo) {
-                            itemInfo.size = item
-                            itemInfo.quantity = cartItems[items][item]
-                            orderItems.push(itemInfo)
-                        }
-                    }
-                }
-            }
-
-            let orderData = {
-                 userId: localStorage.getItem("userId"),
-                address: formData,
-                items: orderItems,
-                amount: getCartAmount() + delivery_fee
-            }
-            
-
-            switch (method) {
-
-                // API Calls for COD
-                case 'cod':
-                    const response = await axios.post(backendUrl + '/api/order/place',orderData,{headers:{token}})
-                    if (response.data.success) {
-                        setCartItems({})
-                        navigate('/orders')
-                    } else {
-                        toast.error(response.data.message)
-                    }
-                    break;
-
-                case 'stripe':
-                    const responseStripe = await axios.post(backendUrl + '/api/order/stripe',orderData,{headers:{token}})
-                    if (responseStripe.data.success) {
-                        const {session_url} = responseStripe.data
-                        window.location.replace(session_url)
-                    } else {
-                        toast.error(responseStripe.data.message)
-                    }
-                    break;
-
-                case 'razorpay':
-
-                    const responseRazorpay = await axios.post(backendUrl + '/api/order/razorpay', orderData, {headers:{token}})
-                    if (responseRazorpay.data.success) {
-                        initPay(responseRazorpay.data.order)
-                    }
-
-                    break;
-
-                default:
-                    break;
-            }
-
-
-        } catch (error) {
-            console.log(error)
-            toast.error(error.message)
-        }
+    if (!token) {
+        toast.error("Please login first!");
+        return;
     }
+
+    // Make sure user exists in context
+    const userId = user?._id;
+    if (!userId) {
+        toast.error("User not found!");
+        return;
+    }
+
+    // Convert cartItems to array
+    const itemsArray = Object.keys(cartItems).map(productId => {
+        const product = products.find(p => p._id === productId);
+        if (!product) return null;
+        return Object.keys(cartItems[productId]).map(size => ({
+            id: productId,
+            name: product.name,
+            size,
+            quantity: cartItems[productId][size],
+            price: product.sizes?.find(s => s.size === size)?.price || product.price
+        }));
+    }).flat().filter(Boolean);
+
+    // Build address from formData
+    const address = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        street: formData.street,
+        city: formData.city,
+        state: formData.state,
+        zipcode: formData.zipcode,
+        country: formData.country,
+        phone: formData.phone
+    };
+
+    try {
+        const response = await axios.post(
+            backendUrl + "/api/order/place",
+            {
+                userId,
+                items: itemsArray,
+                amount: getCartAmount() + delivery_fee,
+                address
+            },
+            { headers: { token } }
+        );
+
+        if (response.data.success) {
+            toast.success("Order placed successfully!");
+            setCartItems({});
+            localStorage.removeItem("cartItems");
+            navigate("/orders"); // ✅ Navigate to Orders page
+        } else {
+            toast.error(response.data.message || "Failed to place order");
+        }
+    } catch (error) {
+        console.log(error);
+        toast.error(error.response?.data?.message || error.message);
+    }
+};
 
 
     return (
